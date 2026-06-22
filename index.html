@@ -41,8 +41,10 @@
           <div class="cat-info-card">
             <h1 class="cat-name-display"><i class="fa-solid fa-cat"></i> <span id="cat-name-val">たま</span></h1>
           </div>
-          <button id="btn-settings" class="btn-circle" title="設定"><i class="fa-solid fa-gear"></i></button>
         </header>
+
+        <!-- 設定ボタンをヘッダーの外（お部屋コンテナ直下）に配置 -->
+        <button id="btn-settings" class="btn-circle btn-settings" title="設定"><i class="fa-solid fa-gear"></i></button>
 
         <!-- メッセージ・今日の一言表示エリア -->
         <div id="daily-message-container" class="daily-message-container hidden">
@@ -77,6 +79,20 @@
               </button>
               <button type="button" class="cat-type-btn" data-cat-type="tsundere">
                 <span>ツンデレ（黒色）</span>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>猫の動き</label>
+            <div class="cat-speed-selector">
+              <button type="button" class="cat-speed-btn" data-cat-speed="fast">
+                <span>ちょこちょこ</span>
+              </button>
+              <button type="button" class="cat-speed-btn active" data-cat-speed="normal">
+                <span>ゆったり</span>
+              </button>
+              <button type="button" class="cat-speed-btn" data-cat-speed="slow">
+                <span>のんびり</span>
               </button>
             </div>
           </div>

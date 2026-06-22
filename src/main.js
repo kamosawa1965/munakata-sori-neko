@@ -399,13 +399,24 @@ function setupEventListeners() {
     });
   });
 
-
+  // 初回起動モーダル内の猫の動き選択
+  document.querySelectorAll('#setup-modal .cat-speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#setup-modal .cat-speed-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.catSpeedPace = btn.dataset.catSpeed;
+      updateUI();
+    });
+  });
 
   // 初回起動スタートボタン
   btnSetupStart.addEventListener('click', () => {
     const enteredName = setupCatNameInput.value.trim();
     state.name = enteredName || 'たま';
     state.isInitialized = true;
+
+    // 即座に動作間隔タイマーを新しいペースに対応させる
+    behaviorTimer = getBehaviorInterval(state.catSpeedPace);
 
     saveSettings();
     updateUI();
