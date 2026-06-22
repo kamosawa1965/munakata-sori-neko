@@ -1,0 +1,706 @@
+/* -----------------------------------------
+ * 飼えない猫 〜デザインシステム & アニメーション〜
+ * ----------------------------------------- */
+
+:root {
+  --font-primary: 'M PLUS Rounded 1c', sans-serif;
+  --font-handwritten: 'Kiwi Maru', serif;
+  
+  --color-bg-light: #fdfbf7;
+  --color-bg-dark: #121214;
+  --color-text-dark: #333333;
+  --color-text-light: #ffffff;
+  
+  --color-primary: #f09a37;
+  --color-primary-hover: #e28925;
+  --color-primary-light: #fef0db;
+  
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-shadow: 0 8px 32px 0 rgba(142, 142, 142, 0.15);
+  
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 基本リセット */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-light);
+  color: var(--color-text-dark);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 背景グラデーション（部屋コンテナの外側） */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(254,240,219,0.5) 0%, rgba(24df,235,224,0.5) 100%);
+  z-index: -1;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 部屋コンテナ */
+.room-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  max-width: 1024px;
+  max-height: 768px;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
+  border: 4px solid rgba(255, 255, 255, 0.6);
+  background-color: #222;
+}
+
+@media (max-width: 1024px), (max-height: 768px) {
+  .room-container {
+    border-radius: 0;
+    border: none;
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+}
+
+/* 部屋の背景画像 */
+.room-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1s ease-in-out;
+  opacity: 0;
+  z-index: 1;
+}
+
+.room-bg.active {
+  opacity: 1;
+}
+
+/* 各背景画像のスタイル */
+.bg-morning {
+  background-image: url('/images/bg_morning.png');
+}
+.bg-day {
+  background-image: url('/images/bg_day.png');
+}
+.bg-night {
+  background-image: url('/images/bg_night.png');
+}
+
+/* 部屋の暗さ（夜の部屋などに少し重ねる薄暗いレイヤー） */
+.room-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(18, 18, 20, 0);
+  transition: background-color 1s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.room-bg-overlay.night-active {
+  background-color: rgba(18, 18, 20, 0.2);
+}
+
+/* グラスモルフィズムカード */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 20px;
+}
+
+/* ヘッダーエリア */
+.room-header {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.cat-info-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+}
+
+.cat-name-display {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5d4037;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-name-display i {
+  color: var(--color-primary);
+}
+
+.btn-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #5d4037;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: var(--transition-smooth);
+}
+
+.btn-circle:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: scale(1.08);
+}
+
+/* 今日の一言メッセージカード */
+.daily-message-container {
+  position: absolute;
+  top: 90px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: center;
+  z-index: 9;
+  animation: slideDown 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.message-card {
+  padding: 14px 44px 14px 20px;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.message-card p {
+  font-family: var(--font-handwritten);
+  font-size: 1.1rem;
+  color: #3e2723;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.btn-close-msg {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: #8d6e63;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+
+.btn-close-msg:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #3e2723;
+}
+
+/* -----------------------------------------
+ * 猫のキャラクター & アニメーション
+ * ----------------------------------------- */
+.cat {
+  position: absolute;
+  bottom: 15%; /* 床に近い位置 */
+  left: 50%;
+  width: clamp(140px, 25%, 260px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  z-index: 5;
+  cursor: pointer;
+  user-select: none;
+  transform-origin: bottom center;
+  transition:
+    left 3.5s ease-in-out,
+    bottom 3.5s ease-in-out,
+    transform 2.5s ease-in-out;
+}
+
+/* 猫の速度ペースごとの移動スピード設定 */
+.cat.pace-fast {
+  transition:
+    left 2.5s ease-in-out,
+    bottom 2.5s ease-in-out,
+    transform 2.5s ease-in-out;
+}
+.cat.pace-normal {
+  transition:
+    left 3.5s ease-in-out,
+    bottom 3.5s ease-in-out,
+    transform 2.5s ease-in-out;
+}
+.cat.pace-slow {
+  transition:
+    left 5s ease-in-out,
+    bottom 5s ease-in-out,
+    transform 2.5s ease-in-out;
+}
+
+.cat-body-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 猫の画像用コンテナ */
+.cat-img-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* 向きの反転 */
+.cat.facing-left .cat-img-container {
+  transform: scaleX(1);
+}
+.cat.facing-right .cat-img-container {
+  transform: scaleX(-1);
+}
+
+/* 吹き出し（にゃーなどの瞬間的な反応） */
+.cat-bubble {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #f7ab5a;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-family: var(--font-handwritten);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #5d4037;
+  white-space: nowrap;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  z-index: 6;
+  pointer-events: none;
+  animation: floatUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cat-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #f7ab5a;
+}
+
+/* タップされたときの跳ねるアニメーション */
+.cat.jump {
+  animation: catJump 0.4s ease-out;
+}
+
+/* 猫の歩行時の体全体の上下揺れアニメーション */
+.cat.walk .cat-img {
+  animation: catWalkSwing 0.6s ease-in-out infinite alternate;
+}
+/* 睡眠時のゆっくりとした呼吸アニメーション */
+.cat.sleep .cat-img {
+  animation: catSleepBreathe 3s ease-in-out infinite;
+}
+/* 伸びのアニメーション */
+.cat.stretch .cat-img {
+  animation: catStretchImage 2s ease-in-out;
+}
+
+/* キーフレーム定義 */
+@keyframes catJump {
+  0% { transform: scale(1) translateY(0); }
+  30% { transform: scale(1.05, 0.95) translateY(0); }
+  50% { transform: scale(0.95, 1.05) translateY(-25px); }
+  75% { transform: scale(1.02, 0.98) translateY(5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes catWalkSwing {
+  0% { transform: translateY(0) rotate(-1.2deg); }
+  100% { transform: translateY(-5px) rotate(1.2deg); }
+}
+
+@keyframes catSleepBreathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.04, 0.96) translateY(3px); }
+}
+
+@keyframes catStretchImage {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.12, 0.88) skewX(6deg) translateY(3px); }
+  60% { transform: scale(0.93, 1.12) translateY(-10px); }
+}
+
+/* -----------------------------------------
+ * モーダル & UI要素
+ * ----------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(247, 245, 240, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  opacity: 1;
+  transition: var(--transition-smooth);
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: #3e2723;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5d4037;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: #8d6e63;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-close-modal:hover {
+  color: #3e2723;
+  transform: scale(1.1);
+}
+
+.setup-intro {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #5d4037;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+/* テキストインプット */
+input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(240, 154, 55, 0.4);
+  background: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  color: #3e2723;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+input[type="text"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(240, 154, 55, 0.2);
+  background: #ffffff;
+}
+
+/* 背景セレクター */
+.bg-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.bg-option-btn {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.bg-option-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.bg-option-btn.active {
+  border-color: var(--color-primary);
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(240, 154, 55, 0.15);
+}
+
+/* 猫タイプセレクター & 猫動きセレクター */
+.cat-type-selector,
+.cat-speed-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.cat-type-btn,
+.cat-speed-btn {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 12px 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.cat-type-btn:hover,
+.cat-speed-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.cat-type-btn.active,
+.cat-speed-btn.active {
+  border-color: var(--color-primary);
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(240, 154, 55, 0.15);
+}
+
+.cat-type-btn span,
+.cat-speed-btn span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #5d4037;
+}
+
+
+
+/* トグルスイッチ */
+.toggles {
+  gap: 16px;
+}
+
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-item span {
+  font-size: 0.95rem;
+  color: #5d4037;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* スイッチ本体 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--color-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* ボタン */
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-family: var(--font-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(240, 154, 55, 0.3);
+  transition: var(--transition-smooth);
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 154, 55, 0.4);
+}
+
+/* ユーティリティ */
+.hidden {
+  display: none !important;
+}
+
+/* アニメーション */
+.animate-pop {
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

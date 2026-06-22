@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>飼えない猫 〜画面の中にいる小さな猫〜</title>
+    <!-- Google Fonts: 温かみのある日本語フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- メインの部屋コンテナ -->
+      <div id="room-container" class="room-container">
+        <!-- 背景画像レイヤー -->
+        <div id="room-bg" class="room-bg bg-window"></div>
+        <div id="room-bg-overlay" class="room-bg-overlay"></div>
+
+        <!-- 猫のキャラクター -->
+        <div id="cat" class="cat walking right">
+          <!-- SVGで猫のパーツを描画（後ほどCSSでアニメーションさせる） -->
+          <div class="cat-body-wrapper">
+            <!-- 吹き出し -->
+            <div id="cat-bubble" class="cat-bubble hidden">
+              <span id="bubble-text">にゃー</span>
+            </div>
+            <!-- 猫の画像用コンテナ（ここで左右反転を行う） -->
+            <div class="cat-img-container">
+              <!-- 猫の画像本体 -->
+              <img id="cat-img" class="cat-img" src="" alt="猫" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 画面上部のステータス表示 -->
+        <header class="room-header">
+          <div class="cat-info-card">
+            <h1 class="cat-name-display"><i class="fa-solid fa-cat"></i> <span id="cat-name-val">たま</span></h1>
+          </div>
+          <button id="btn-settings" class="btn-circle" title="設定"><i class="fa-solid fa-gear"></i></button>
+        </header>
+
+        <!-- メッセージ・今日の一言表示エリア -->
+        <div id="daily-message-container" class="daily-message-container hidden">
+          <div class="glass-card message-card">
+            <p id="daily-message-text">今日もここにいるね。</p>
+            <button id="btn-close-message" class="btn-close-msg"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 初回セットアップモーダル -->
+      <div id="setup-modal" class="modal-overlay setup-modal hidden">
+        <div class="glass-card modal-content animate-pop">
+          <h2><i class="fa-solid fa-paw"></i> はじめまして</h2>
+          <p class="setup-intro">
+            ここは「飼えない猫」の部屋です。<br>
+            猫はただ、のんびりと過ごしています。<br>
+            お世話も、ごはんも必要ありません。
+          </p>
+          <div class="form-group">
+            <label for="setup-cat-name">猫に名前をつけてあげてください</label>
+            <input type="text" id="setup-cat-name" placeholder="たま、みけ、クロなど..." maxlength="10">
+          </div>
+          <div class="form-group">
+            <label>一緒に過ごす猫を選んでください</label>
+            <div class="cat-type-selector">
+              <button type="button" class="cat-type-btn active" data-cat-type="normal">
+                <span>ノーマル（茶色）</span>
+              </button>
+              <button type="button" class="cat-type-btn" data-cat-type="cute">
+                <span>キュート（白色）</span>
+              </button>
+              <button type="button" class="cat-type-btn" data-cat-type="tsundere">
+                <span>ツンデレ（黒色）</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-setup-start" class="btn-primary">部屋に入る</button>
+        </div>
+      </div>
+
+      <!-- 設定モーダル -->
+      <div id="settings-modal" class="modal-overlay settings-modal hidden">
+        <div class="glass-card modal-content animate-pop">
+          <div class="modal-header">
+            <h3><i class="fa-solid fa-sliders"></i> お部屋の設定</h3>
+            <button id="btn-settings-close" class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="form-group">
+            <label for="settings-cat-name">名前を変更する</label>
+            <input type="text" id="settings-cat-name" maxlength="10">
+          </div>
+          <div class="form-group">
+            <label>一緒に過ごす猫</label>
+            <div class="cat-type-selector">
+              <button type="button" class="cat-type-btn" data-cat-type="normal">
+                <span>ノーマル（茶色）</span>
+              </button>
+              <button type="button" class="cat-type-btn" data-cat-type="cute">
+                <span>キュート（白色）</span>
+              </button>
+              <button type="button" class="cat-type-btn" data-cat-type="tsundere">
+                <span>ツンデレ（黒色）</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>猫の動き</label>
+            <div class="cat-speed-selector">
+              <button type="button" class="cat-speed-btn" data-cat-speed="fast">
+                <span>ちょこちょこ</span>
+              </button>
+              <button type="button" class="cat-speed-btn" data-cat-speed="normal">
+                <span>ゆったり</span>
+              </button>
+              <button type="button" class="cat-speed-btn" data-cat-speed="slow">
+                <span>のんびり</span>
+              </button>
+            </div>
+          </div>
+
+
+          <div class="settings-footer">
+            <button id="btn-settings-save" class="btn-primary">保存して閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
