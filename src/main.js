@@ -60,30 +60,58 @@ function getBehaviorInterval(pace) {
   }
 }
 
-// 吹き出し・今日の一言メッセージのリスト
-const reactions = [
-  'にゃあ',
-  'ごろごろ……',
-  'なでてくれた？',
-  'うれしいにゃ',
-  'ゆっくりしていってね',
-  '……にゃ？',
-  'ふにゃ〜',
-  'しっぽがぴくぴくする',
-  'あったかいにゃあ'
-];
+// 猫の性格（タイプ）ごとの吹き出しメッセージ
+const catReactions = {
+  normal: [
+    'にゃー',
+    'なでてくれてありがとう',
+    'そばにいるよ',
+    'ごろごろ……',
+    'あったかいにゃあ',
+    'しっぽがぴくぴくする'
+  ],
+  cute: [
+    'にゃんっ',
+    'もっとなでて〜',
+    'うれしいにゃ',
+    'いっしょにいてね',
+    'ふにゃ〜',
+    'ごろごろ……あまえんぼさんだにゃ'
+  ],
+  tsundere: [
+    'べ、別にうれしくないし',
+    '……もう少しなら、なでてもいいよ',
+    'ふん、悪くないね',
+    'そばにいてもいいけど？',
+    'な、なにするのさっ',
+    '……べ、べつにゴロゴロなんて言ってない！'
+  ]
+};
 
-const dailyMessages = [
-  '今日もここにいるね。無理しなくていいよ。',
-  'ちょっと一息いれて、お茶でも飲まない？',
-  'がんばりすぎちゃうあなたへ。少し休もう。',
-  'あえてうれしいな。今日もいい日になりますように。',
-  '窓の外は静かだよ。のんびり眺めよう。',
-  '何もしなくても、私はいつでもここにいるからね。',
-  'ゆっくり深呼吸してみて。すーはー。',
-  '今日もおつかれさま。よくがんばったね。',
-  'たまには何もしない時間も大切だよ。'
-];
+// 猫の性格（タイプ）ごとの今日の一言メッセージ
+const catDailyMessages = {
+  normal: [
+    '今日もおつかれさま。よくがんばったね。',
+    'ちょっと一息いれて、お茶でも飲まない？',
+    'がんばりすぎちゃうあなたへ。少し休もう。',
+    '何もしなくても、私はいつでもここにいるからね。',
+    'ゆっくり深呼吸してみて。すーはー。'
+  ],
+  cute: [
+    'きょうもおつかれさまだにゃ！なでなでして〜！',
+    'いっしょにあそぼ？おやつもたべたいにゃあ。',
+    'がんばるあなたちゃん、だーいすきっ！',
+    'ここにずっといるから、どこにもいっちゃやだにゃ。',
+    'ふわぁ……いっしょにおひるねしよ？'
+  ],
+  tsundere: [
+    'ふん、今日もお疲れさま。……体、壊さないようにしなさいよね。',
+    'ちょっと、働きすぎじゃない？……べ、別に心配してるわけじゃないけど。',
+    'たまには休んだら？私だって、暇つぶし相手がいないと退屈だし。',
+    'な、何よ。私がここにいてあげるんだから、元気出しなさいよね。',
+    'ぼーっとする時間も必要でしょ。……横、空けておいてあげたから。'
+  ]
+};
 
 
 
@@ -271,8 +299,10 @@ function checkFirstRun() {
 }
 
 function showDailyMessage() {
-  const randomIndex = Math.floor(Math.random() * dailyMessages.length);
-  dailyMessageText.textContent = dailyMessages[randomIndex].replace('あなた', state.name + 'の友達');
+  const type = state.catType || 'normal';
+  const messages = catDailyMessages[type] || catDailyMessages['normal'];
+  const randomIndex = Math.floor(Math.random() * messages.length);
+  dailyMessageText.textContent = messages[randomIndex].replace('あなた', state.name + 'の友達');
   dailyMessageContainer.classList.remove('hidden');
 }
 
@@ -362,6 +392,8 @@ function strokeCat() {
   catElement.classList.add('jump');
 
   // 吹き出し表示
+  const type = state.catType || 'normal';
+  const reactions = catReactions[type] || catReactions['normal'];
   const randReact = reactions[Math.floor(Math.random() * reactions.length)];
   bubbleText.textContent = randReact;
   catBubble.classList.remove('hidden');
@@ -464,6 +496,7 @@ function setupEventListeners() {
 
     saveSettings();
     updateUI();
+    showDailyMessage();
     settingsModal.classList.add('hidden');
   });
 
